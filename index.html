@@ -1,0 +1,616 @@
+<html>
+  <head>
+    <title>The Rolling Cube - HTML Simulator</title>
+    <style type="text/css">
+    html {
+      font-family: Helvetica;
+    }
+    header {
+      background: #36A7E3;
+      color: #fff;
+      margin-bottom: 10px;
+      font-size: 20px;
+      font-weight: bolder;
+      font-family: 'Trebuchet MS';
+      padding: 5px;
+      text-align: center;
+    }
+    #map {
+      width: 600px;
+      height: 600px;
+      border: solid 1px #000;
+      float: left;
+      position: relative;
+    }
+    .surface {
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      border: solid 1px #000;
+      box-sizing: border-box;
+    }
+
+    .surface.disabled {
+      background: rgba(0,0,0,0.5);
+    }
+    #surface-template {
+      display: none;
+    }
+
+
+    .surface.surface-targeted {
+      border: solid 2px #f00;
+    }
+
+
+    #cube {
+     /* background: #00f;
+      width: 50px;
+      height: 50px;
+      position: absolute;*/
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      display: none;
+    }
+
+    #cube-bottom-face {
+      width: 50px;
+      height: 50px;
+      background: rgba(255,255,0,0.5);
+    }
+    #cube-top-face {
+      border: solid 1px #000;
+      width: 80px;
+      height: 80px;
+      background: rgba(255,255,255,0.5);
+      position: absolute;
+      left: -15px;
+      top: -15px;
+      box-sizing: border-box;
+      opacity: 0.2;
+      /*border-bottom: 1px solid #000;
+      border-top: 1px solid #000;
+      border-left: 1px solid #000;
+      border-right: 1px solid #000;*/
+    }
+    #cube-north-face {
+      border-top: 15px solid rgba(255,0,0,0.5); 
+      border-left: 15px solid transparent; 
+      border-right: 15px solid transparent; 
+      width: 50px; 
+      position: absolute;
+      top: -15px;
+      left: -15px;
+    }
+    #cube-south-face {
+      border-bottom: 15px solid rgba(255,0,255,0.5); 
+      border-left: 15px solid transparent; 
+      border-right: 15px solid transparent; 
+      width: 50px; 
+      position: absolute;
+      top: 50px;
+      left: -15px;
+    }
+    #cube-west-face {
+      border-left: 15px solid rgba(0,255,0,0.5); 
+      border-top: 15px solid transparent; 
+      border-bottom: 15px solid transparent; 
+      height: 50px; 
+      position: absolute;
+      top: -15px;
+      left: -15px;
+    }
+
+    #cube-east-face {
+      border-right: 15px solid rgba(0,0,255,0.5); 
+      border-top: 15px solid transparent; 
+      border-bottom: 15px solid transparent; 
+      height: 50px; 
+      position: absolute;
+      top: -15px;
+      left: 50px;
+    }
+
+    .panel {
+      border: solid 1px #000;
+      display: inline-block;
+      margin: 5px 20px;
+      width: 400px;
+      /*height: 200px;*/
+    }
+
+    .panel-header {
+      text-align: center;
+      background: #000;
+      color: #fff;
+    }
+
+    .terrian {
+      margin: 5px;
+    }
+    .terrian-box {
+      border: solid 1px #000;
+      width: 50px;
+      height: 50px;
+      display: inline-block;
+      position: relative;
+    }
+
+    .terrian-desc {
+      font-size: 10px;
+      text-align: center;
+      position: absolute;
+      width: inherit;
+      line-height: 10px;
+      height: 10px;
+      bottom: 0;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+    }
+
+    .face {
+      margin: 5px;
+    }
+    .face-box {
+      border: solid 1px #000;
+      width: 50px;
+      height: 50px;
+      display: inline-block;
+      position: relative;
+    }
+    
+    .face-desc {
+      font-size: 10px;
+      text-align: center;
+      position: absolute;
+      width: inherit;
+      line-height: 10px;
+      height: 10px;
+      bottom: 0;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+    }
+
+    #helptext {
+      /*font-size: 12px;*/
+    }
+
+    /*   terrians   */
+
+    div[type='blank'] {
+      background: #FFFBCC;
+    }
+    div[type='start'] {
+      background: #65CD3C;
+      /*background-color: #65CD3C;
+      background-image: -webkit-linear-gradient(bottom left, black 25%, transparent 25%, transparent 75%, black 75%, black), 
+      -webkit-linear-gradient(bottom left, black 25%, transparent 25%, transparent 75%, black 75%, black);
+      background-image: -o-linear-gradient(bottom left, black 25%, transparent 25%, transparent 75%, black 75%, black), 
+      -o-linear-gradient(bottom left, black 25%, transparent 25%, transparent 75%, black 75%, black);
+      background-image: linear-gradient(to top right, black 25%, transparent 25%, transparent 75%, black 75%, black), 
+      linear-gradient(to top right, black 25%, transparent 25%, transparent 75%, black 75%, black);;
+      background-size:10px 10px;*/
+    }
+    div[type='finish'] {
+      background: #53E5ED;
+    }
+    div[type='fire'] {
+      background: 
+      linear-gradient(135deg, #EB5A26 25%, transparent 25%) -5px 0,
+      linear-gradient(225deg, #EB5A26 25%, transparent 25%) -5px 0,
+      linear-gradient(315deg, #EB5A26 25%, transparent 25%),
+      linear-gradient(45deg, #EB5A26 25%, transparent 25%); 
+      background-size: 10px 10px;
+      background-color: #C61431;
+    }
+
+    div[type='roadblock'] {
+      background: 
+      linear-gradient(135deg, #000000 25%, transparent 25%) -5px 0,
+      linear-gradient(225deg, #000000 25%, transparent 25%) -5px 0,
+      linear-gradient(315deg, #000000 25%, transparent 25%),
+      linear-gradient(45deg, #000000 25%, transparent 25%); 
+      background-size: 10px 10px;
+      background-color: #F8FF08;
+    }
+    div[type='ice'] {
+      background: 
+      linear-gradient(135deg, #1AA7E8 25%, transparent 25%) -5px 0,
+      linear-gradient(225deg, #1AA7E8 25%, transparent 25%) -5px 0,
+      linear-gradient(315deg, #1AA7E8 25%, transparent 25%),
+      linear-gradient(45deg, #1AA7E8 25%, transparent 25%); 
+      background-size: 10px 10px;
+      background-color: #ADE4EE;
+    }
+    
+    /*   faces   */
+
+    .face-box[type='wood'] {
+      background: rgba(255,255,0,0.5);
+    }
+
+    .face-box[type='iron'] {
+      background: rgba(0,0,255,0.5);
+    }
+
+    .face-box[type='stone'] {
+      background: rgba(10,10,10,0.5);
+    }
+
+    </style>
+    <script type="text/javascript" src="jquery-1.9.1.min.js"></script>
+    <script type="text/javascript">
+    $(function(){
+      var $surface = $('#surface-template');
+      var $surfaceNow = null;
+      var facelist = ['wood', 'iron', 'stone'];
+      var faces = {
+        'wood': 'rgba(255,255,0,0.5)', // yellow,
+        'iron': 'rgba(0,0,255,0.5)', //blue,
+        'stone': 'rgba(10,10,10,0.5)', // red
+        // 'south': 'rgba(255,0,255,0.5)', // purple
+        // 'west': 'rgba(0,255,0,0.5)', //green
+        // 'east': 'rgba(0,0,255,0.5)', //blue
+        // 'bottom': 'rgba(255,255,0,0.5)', // yellow
+        // 'top': 'rgba(255,255,255,0.5)', //white
+      }
+      var cube = {
+        'north': 'wood',
+        'south': 'wood',
+        'west': 'wood',
+        'east': 'wood',
+        'bottom': 'wood',
+        'top': 'wood',
+      }
+
+
+      $('#cube-east-face').css({
+        borderRightColor: faces[cube['east']],
+      });
+      $('#cube-west-face').css({
+        borderLeftColor: faces[cube['west']],
+      });
+      $('#cube-north-face').css({
+        borderTopColor: faces[cube['north']],
+      });
+      $('#cube-south-face').css({
+        borderBottomColor: faces[cube['south']],
+      });
+      $('#cube-top-face').css({
+        background: faces[cube['top']],
+      });
+      $('#cube-bottom-face').css({
+        background: faces[cube['bottom']],
+      });
+
+      for(var i=0; i<12; i++){
+        for(var j=0; j<12; j++){
+          var newSurface = $surface.clone();
+          // newSurface.removeAttr('id');
+          newSurface.attr('id','surface'+i+'_'+j);
+          newSurface.attr('type', 'blank');
+          newSurface.attr('_x', j);
+          newSurface.attr('_y', i);
+          $('#map').append(newSurface);
+        }
+      }
+
+      $('.surface').not('.disabled').on('click', function(){
+        $('.surface').removeClass('surface-targeted');
+        $(this).addClass('surface-targeted');
+        $surfaceNow = $(this);
+      });
+
+      $('.terrian-box').on('click', function(){
+        var thisType = $(this).attr('type');
+        $surfaceNow.attr('type',thisType);
+      });
+
+      $('#set-size-btn').on('click', function(){
+        var w = $('#map-width-input').val();
+        var h = $('#map-height-input').val();
+        $('.surface').addClass('disabled');
+        for(var i=0; i<w; i++){
+          for(var j=0; j<h; j++){
+            $('#surface'+i+'_'+j).removeClass('disabled');
+          }
+        }
+      });
+
+      $('#simulte-btn').on('click', function(){
+        var originX = $('.surface[type="start"]').attr('_x');
+        var originY = $('.surface[type="start"]').attr('_y');
+        // alert(originX+'_'+originY);
+        var originLeft = 50 * parseInt(originX);
+        var originTop = 50 * parseInt(originY);
+        cube['top'] = $('#top-face-box').attr('type');
+        cube['bottom'] = $('#bottom-face-box').attr('type');
+        cube['north'] = $('#north-face-box').attr('type');
+        cube['south'] = $('#south-face-box').attr('type');
+        cube['west'] = $('#west-face-box').attr('type');
+        cube['east'] = $('#east-face-box').attr('type');
+        $('#cube').css({
+          left: originLeft,
+          top: originTop,
+        });
+        $('#cube-north-face').css({
+          borderTopColor: faces[cube['north']],
+        });
+        $('#cube-south-face').css({
+          borderBottomColor: faces[cube['south']],
+        });
+        $('#cube-east-face').css({
+          borderRightColor: faces[cube['east']],
+        });
+        $('#cube-west-face').css({
+          borderLeftColor: faces[cube['west']],
+        });
+        $('#cube-top-face').css({
+          background: faces[cube['top']],
+        });
+        $('#cube-bottom-face').css({
+          background: faces[cube['bottom']],
+        });
+        $('#cube').show();
+      });
+
+      $('.face-box').on('click', function(){
+
+        // for(var i=0; i<faces.length; i++){
+        // var isFound = false;
+        var thisTypeId = $(this).attr('type-id');
+        var typeId = thisTypeId<facelist.length-1 ? parseInt(thisTypeId)+1 : 0;
+        // thisBox.attr('type',faces[facelist[typeId]]);
+        // alert(faces[facelist[typeId]);
+        $(this).attr('type-id',typeId);
+        $(this).attr('type',facelist[typeId]);
+        // for (var i=0; i<facelist; i++){
+
+        // $.each(faces,function(i,v){
+        //   if(isFound){
+        //     thisBox.attr('type',i);
+        //     isFound = false;
+        //     // alert(i);
+        //   }
+        //   if(i == thisType){
+        //     isFound = true;
+        //   }
+        // });
+        // var i = 1;
+        // alert(faces[i]);
+        // $(this).attr('type',faces[i]);
+        // }
+      });
+
+      $(document).keydown(function(e){
+        switch(e.which) {
+            case 37: // left
+              var temp = cube['bottom'];
+              cube['bottom'] = cube['west'];
+              cube['west'] = cube['top'];
+              cube['top'] = cube['east'];
+              cube['east'] = temp;
+              $('#cube').css({
+                  left: '-=50px',
+                });
+              $('#cube-east-face').css({
+                borderRightColor: faces[cube['east']],
+              });
+              $('#cube-west-face').css({
+                borderLeftColor: faces[cube['west']],
+              });
+              $('#cube-top-face').css({
+                background: faces[cube['top']],
+              });
+              $('#cube-bottom-face').css({
+                background: faces[cube['bottom']],
+              });
+            break;
+            case 38: // up
+              var temp = cube['bottom'];
+              cube['bottom'] = cube['north'];
+              cube['north'] = cube['top'];
+              cube['top'] = cube['south'];
+              cube['south'] = temp;
+              $('#cube').css({
+                  top: '-=50px',
+                });
+              $('#cube-north-face').css({
+                borderTopColor: faces[cube['north']],
+              });
+              $('#cube-south-face').css({
+                borderBottomColor: faces[cube['south']],
+              });
+              $('#cube-top-face').css({
+                background: faces[cube['top']],
+              });
+              $('#cube-bottom-face').css({
+                background: faces[cube['bottom']],
+              });
+            break;
+
+            case 39: // right
+              
+              $('#cube-east-face').animate({
+                // borderRightWidth: '50px',
+                // borderTopWidth: '0px',
+                // borderBottomWidth: '0px',
+                // top: '0px',
+              },100,function(){
+
+
+                var temp = cube['bottom'];
+                cube['bottom'] = cube['east'];
+                cube['east'] = cube['top'];
+                cube['top'] = cube['west'];
+                cube['west'] = temp;
+
+                $('#cube').css({
+                  left: '+=50px',
+                });
+                $('#cube-east-face').css({
+                  borderRightColor: faces[cube['east']],
+                });
+                $('#cube-west-face').css({
+                  borderLeftColor: faces[cube['west']],
+                });
+                $('#cube-top-face').css({
+                  background: faces[cube['top']],
+                });
+                $('#cube-bottom-face').css({
+                  background: faces[cube['bottom']],
+                });
+              });
+              // $('#cube-top-face').css({
+              //   borderTop: '15px solid transparent',
+              //   borderBottom: '15px solid transparent',
+              //   borderRightColor: '#fff',
+              // });
+              // $('#cube-top-face').animate({
+              //   borderRightWidth: '15px',
+              //   left: '100px',
+              //   width: '0',
+              // },100,function(){
+
+              // });
+            break;
+
+            case 40: // down
+              var temp = cube['bottom'];
+              cube['bottom'] = cube['south'];
+              cube['south'] = cube['top'];
+              cube['top'] = cube['north'];
+              cube['north'] = temp;
+              $('#cube').css({
+                  top: '+=50px',
+                });
+              $('#cube-north-face').css({
+                borderTopColor: faces[cube['north']],
+              });
+              $('#cube-south-face').css({
+                borderBottomColor: faces[cube['south']],
+              });
+              $('#cube-top-face').css({
+                background: faces[cube['top']],
+              });
+              $('#cube-bottom-face').css({
+                background: faces[cube['bottom']],
+              });
+            break;
+
+            default: return; // exit this handler for other keys
+        }
+        refreshCubeFaces();
+        e.preventDefault(); // pr
+      });
+
+      function refreshCubeFaces(){
+        // $('#top-face-box').attr('type-id', cube['top']);
+        $('#top-face-box').attr('type', cube['top']);
+        $('#bottom-face-box').attr('type', cube['bottom']);
+        $('#north-face-box').attr('type', cube['north']);
+        $('#south-face-box').attr('type', cube['south']);
+        $('#west-face-box').attr('type', cube['west']);
+        $('#east-face-box').attr('type', cube['east']);
+      }
+    });
+    </script>
+  </head>
+  <body>
+    <header>
+      The Rolling Cube - HTML Simulator
+    </header>
+    <div id="map">
+      <div id="surface-template" class="surface">
+      </div>
+      <div id="cube">
+        <div id="cube-bottom-face"></div>
+        <div id="cube-west-face"></div>
+        <div id="cube-east-face"></div>
+        <div id="cube-north-face"></div>
+        <div id="cube-south-face"></div>
+        <div id="cube-top-face"></div>
+      </div>
+    </div>
+    <div id="help" class="panel">
+      <div class="panel-header">Help</div>
+      <div class="panel-body">
+        <ol id="helptext">
+          <li>Input W*H to set the size of the map.</li>
+          <li>Click one grid on the map and set its terrian in the 'Terrians' panel.</li>
+          <li>Set the initial faces of the cube.</li>
+          <li>Click 'Simulate' button and the cube will appear at the start area.</li>
+          <li>Use arrow keys to roll the cube.</li>
+          <li>This is just for a visual simulation, no interactions included.</li>
+          <li>There are some bugs with Safari, terrian patterns not displayed in the panel.</li>
+        </ol>
+      </div>
+      <div class="panel-footer"></div>
+    </div>
+    <div id="info" class="panel">
+      <div class="panel-header">Map Info</div>
+      <div class="panel-body">
+        <p>W:<input id="map-width-input" type="number" /> * H:<input id="map-height-input" type="number" /></p>
+        <p>
+          <input id="set-size-btn" type="button" value="Set Size" />
+          <input id="simulte-btn" type="button" value="Simulate" />
+        </p>
+      </div>
+      <div class="panel-footer"></div>
+    </div>
+    <div id="terrian" class="panel">
+      <div class="panel-header">Terrians</div>
+      <div class="panel-body">
+        <div class="terrian">
+          <div class="terrian-box" type="blank">
+            <div class="terrian-desc">Blank</div>
+          </div>
+          <div class="terrian-box" type="start">
+            <div class="terrian-desc">Start</div>
+          </div>
+          <div class="terrian-box" type="finish">
+            <div class="terrian-desc">Finish</div>
+          </div>
+          <div class="terrian-box" type="fire">
+            <div class="terrian-desc">Fire</div>
+          </div>
+          <div class="terrian-box" type="roadblock">
+            <div class="terrian-desc">Roadblock</div>
+          </div>
+          <div class="terrian-box" type="ice">
+            <div class="terrian-desc">Ice</div>
+          </div>
+          
+        </div>
+      </div>
+      <div class="panel-footer"></div>
+    </div>
+    <div id="cubeinfo" class="panel">
+      <div class="panel-header">Cube</div>
+      <div class="panel-body">
+        <div class="face">
+          <div id="top-face-box" class="face-box" type-id="0" type="wood">
+            <div class="face-desc">Top</div>
+          </div>
+          <div id="bottom-face-box" class="face-box" type-id="0" type="wood">
+            <div class="face-desc">Bottom</div>
+          </div>
+          <div id="north-face-box" class="face-box" type-id="0" type="wood">
+            <div class="face-desc">North</div>
+          </div>
+          <div id="south-face-box" class="face-box" type-id="0" type="wood">
+            <div class="face-desc">South</div>
+          </div>
+          <div id="west-face-box" class="face-box" type-id="0" type="wood">
+            <div class="face-desc">West</div>
+          </div>
+          <div id="east-face-box" class="face-box" type-id="0" type="wood">
+            <div class="face-desc">East</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-footer"></div>
+    </div>
+  </body>
+</html>
