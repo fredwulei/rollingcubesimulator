@@ -500,6 +500,27 @@
               });
             break;
 
+            case 87: // w
+               $('#cube').css({
+                  top: '-=50px',
+                });
+            break;
+            case 83: // s
+               $('#cube').css({
+                  top: '+=50px',
+                });
+            break;
+            case 65: // a
+               $('#cube').css({
+                  left: '-=50px',
+                });
+            break;
+            case 68: // d
+               $('#cube').css({
+                  left: '+=50px',
+                });
+            break;
+
             default: return; // exit this handler for other keys
         }
         refreshCubeFaces();
